@@ -20,20 +20,35 @@ __status__ = 'Development'
 import binascii
 import sys
 
+class InitRegisters:
+  reg_a = 0x67452301
+  reg_b = 0xefcdab89
+  reg_c = 0x98badcfe
+  reg_d = 0x10325476
+
 class ShiftConst:
-  values = (7, 12, 17, 22, 5,  9, 14, 20, 4, 11, 16, 23,6, 10, 15, 21)
+  values = (7, 12, 17, 22, 7, 12, 17, 22, 7, 12, 17, 22, 7, 12, 17, 22,
+            5,  9, 14, 20, 5,  9, 14, 20, 5,  9, 14, 20, 5,  9, 14, 20,
+            4, 11, 16, 23, 4, 11, 16, 23, 4, 11, 16, 23, 4, 11, 16, 23,
+            6, 10, 15, 21, 6, 10, 15, 21 , 6, 10, 15, 21, 6, 10, 15, 21)
 
 class TConst:
-  values = (0xD76AA478,0xE8C7B756,0x242070DB,0xC1BDCEEE,
-            0xF57C0FAF,0x698098D8,0x8B44F7AF,0xFFFF5BB1,
-            0x895CD7BE,0x6B901122,0xF61E2562,0xC040B340,
-            0x265E5A51,0xE9B6C7AA,0xD62F105D,0x21E1CDE6,
-            0xC33707D6,0xF4D50D87,0x455A14ED,0xA9E3E905, 
-            0xFFFA3942,0x8771F681,0x6D9D6122,0xFDE5380C,
-            0xA4BEEA44,0x289B7EC6,0xEAA127FA,0xD4EF3085,
-            0x04881D05,0xD9D4D039,0xF4292244,0x432AFF97,
-            0xAB9423A7,0xFC93A039,0x655B59C3,0x6FA87E4F,
-            0xFE2CE6E0,0xA3014314,0x4E0811A1,0xF7537E82)
+  values = (0xd76aa478, 0xe8c7b756, 0x242070db, 0xc1bdceee, 
+            0xf57c0faf, 0x4787c62a, 0xa8304613, 0xfd469501, 
+            0x698098d8, 0x8b44f7af, 0xffff5bb1, 0x895cd7be, 
+            0x6b901122, 0xfd987193, 0xa679438e, 0x49b40821, 
+            0xf61e2562, 0xc040b340, 0x265e5a51, 0xe9b6c7aa, 
+            0xd62f105d, 0x02441453, 0xd8a1e681, 0xe7d3fbc8, 
+            0x21e1cde6, 0xc33707d6, 0xf4d50d87, 0x455a14ed, 
+            0xa9e3e905, 0xfcefa3f8, 0x676f02d9, 0x8d2a4c8a, 
+            0xfffa3942, 0x8771f681, 0x6d9d6122, 0xfde5380c, 
+            0xa4beea44, 0x4bdecfa9, 0xf6bb4b60, 0xbebfbc70, 
+            0x289b7ec6, 0xeaa127fa, 0xd4ef3085, 0x04881d05, 
+            0xd9d4d039, 0xe6db99e5, 0x1fa27cf8, 0xc4ac5665, 
+            0xf4292244, 0x432aff97, 0xab9423a7, 0xfc93a039, 
+            0x655b59c3, 0x8f0ccc92, 0xffeff47d, 0x85845dd1, 
+            0x6fa87e4f, 0xfe2ce6e0, 0xa3014314, 0x4e0811a1, 
+            0xf7537e82, 0xbd3af235, 0x2ad7d2bb, 0xeb86d391) 
 
 class InputData:
 
@@ -56,8 +71,9 @@ class InputData:
     self.input_type = input_type
     self.input_data_bin = ""
     self.input_data_len = len(input_data)
-    self.input_data_bin_len = 0
-    self.padded_data_bin_len = 0
+    self.input_data_bin_len = 0  # in decimal len of input data in binary without padding
+    self.padded_data_bin_len = 0  #in binary with leading zeros
+    self.num_of_bin_blocks = 0
 
   def transform_to_bits(self):
     """ Description
@@ -83,6 +99,9 @@ class InputData:
     :rtype:
     """
     self.input_data_bin_len = len(self.input_data_bin)
+
+  def set_num_of_bin_blocks(self):
+    self.num_of_bin_blocks = len(self.input_data_bin) // 512
 
   def get_input_data_bin(self):
     """ Description
@@ -123,6 +142,7 @@ class InputData:
       self.input_data_bin += zeroes_to_add * "0"
     self.transform_message_length()
     self.input_data_bin += self.padded_data_bin_len
+    self.set_num_of_bin_blocks()
 
   def transform_message_length(self):
     
@@ -137,6 +157,77 @@ class InputData:
     padded_data_bin_len = self.input_data_bin_len
     self.padded_data_bin_len = format(padded_data_bin_len,"0>64b")
 
+class Md5:
+  
+  def __init__(self,init_registers):
+    self.reg_a = init_registers.reg_a
+    self.reg_b = init_registers.reg_b
+    self.reg_c = init_registers.reg_c
+    self.reg_d = init_registers.reg_d
+
+  def function_f(self,reg_b,reg_c,reg_d):
+    f = (reg_b & reg_c) | (~reg_b & reg_d)
+    return f
+
+  def function_g(self,reg_b,reg_c,reg_d):
+    g = (reg_b & reg_d) | (reg_c & ~reg_d)
+    return g
+
+  def function_h(self,reg_b,reg_c,reg_d):
+    h = (reg_b ^ reg_c ^ reg_d)
+    return h
+
+  def function_i(self,reg_b,reg_c,reg_d):
+    i = reg_c ^ (reg_b | ~reg_d)
+    return i
+
+  def left_bit_rotate(self,bits_to_rotate,nth_rotation):
+    return ((bits_to_rotate << nth_rotation) | (bits_to_rotate >> (32 - nth_rotation)))
+
+  def swap_byte_order(self,to_be_swapped):
+    return int.from_bytes(to_be_swapped.to_bytes(4,byteorder='little'), byteorder='big')
+
+  def rounds(self,input_data):
+    reg_a, reg_b, reg_c, reg_d = self.reg_a, self.reg_b, self.reg_c, self.reg_d
+
+    cntr = 0
+
+    for nth_block in range(input_data.num_of_bin_blocks): #loop over 512bit parts of input
+      for nth_32bit_block in range(16):
+        data_32bit = input_data.input_data_bin[512*nth_block:512*(nth_block+1)][32*nth_32bit_block:32*(nth_32bit_block+1)]
+        for i in range(64):
+          if (i <= 15):
+            fun_ret = self.function_f(reg_b,reg_c,reg_d)
+          elif (i <= 31):
+            fun_ret = self.function_g(reg_b,reg_c,reg_d)
+          elif (i <= 47):
+            fun_ret = self.function_h(reg_b,reg_c,reg_d)
+          else:
+            fun_ret = self.function_i(reg_b,reg_c,reg_d)
+
+          addition_chain = (((((reg_a + fun_ret) & 0xFFFFFFFF) + self.swap_byte_order(int(data_32bit,2))) & 0xFFFFFFFF) + TConst.values[i]) & 0xFFFFFFFF
+          reg_a = reg_d
+          reg_d = reg_c
+          reg_c = reg_b
+          reg_b = (reg_b + self.left_bit_rotate(addition_chain,ShiftConst.values[i])) & 0xFFFFFFFF
+          if(i == 0):
+            cntr += 1
+            print("i: " + str(i))
+            print("data: " + data_32bit)
+    
+
+        self.reg_a = (self.reg_a + reg_a) & 0xFFFFFFFF
+        self.reg_b = (self.reg_b + reg_b) & 0xFFFFFFFF
+        self.reg_c = (self.reg_c + reg_c) & 0xFFFFFFFF
+        self.reg_d = (self.reg_d + reg_d) & 0xFFFFFFFF
+        """
+        print(hex(self.reg_a))
+        print(hex(self.reg_b))
+        print(hex(self.reg_c))
+        print(hex(self.reg_d))
+        """
+    print(cntr)
+    return str(self.reg_a) + str(self.reg_b) + str(self.reg_c) + str(self.reg_c)           
 
 if __name__ == "__main__":
   #my_str = "THIS IS MY TEXTč"
@@ -148,8 +239,10 @@ if __name__ == "__main__":
   input_data.bit_length_alignment()
   print(input_data.padded_data_bin_len)
   print("\n")
-  print(input_data.input_data_bin)
-
+  print(bin(int(input_data.input_data_bin,2)))
+  print("NUM OF INT BLOCKS: " + str(input_data.num_of_bin_blocks))
+  md5 = Md5(InitRegisters)
+  print(hex(int(md5.rounds(input_data))))
 
   #TODO ARGUMENTS
   #TODO PYDOC
