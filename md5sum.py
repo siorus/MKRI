@@ -190,48 +190,53 @@ class Md5:
   def rounds(self,input_data):
     reg_a, reg_b, reg_c, reg_d = self.reg_a, self.reg_b, self.reg_c, self.reg_d
 
-    cntr = 0
+
 
     for nth_block in range(input_data.num_of_bin_blocks): #loop over 512bit parts of input
-      for nth_32bit_block in range(16):
-        data_32bit = input_data.input_data_bin[512*nth_block:512*(nth_block+1)][32*nth_32bit_block:32*(nth_32bit_block+1)]
-        for i in range(64):
-          if (i <= 15):
-            fun_ret = self.function_f(reg_b,reg_c,reg_d)
-          elif (i <= 31):
-            fun_ret = self.function_g(reg_b,reg_c,reg_d)
-          elif (i <= 47):
-            fun_ret = self.function_h(reg_b,reg_c,reg_d)
-          else:
-            fun_ret = self.function_i(reg_b,reg_c,reg_d)
+      #for nth_32bit_block in range(16):
+      #  data_32bit = input_data.input_data_bin[512*nth_block:512*(nth_block+1)][32*nth_32bit_block:32*(nth_32bit_block+1)]
+      for i in range(64):
+        data_32bit = input_data.input_data_bin[512*nth_block:512*(nth_block+1)][32*(i % 16):32*((i % 16 +1))]
+        if (i <= 15):
+          fun_ret = self.function_f(reg_b,reg_c,reg_d)
+        elif (i <= 31):
+          fun_ret = self.function_g(reg_b,reg_c,reg_d)
+        elif (i <= 47):
+          fun_ret = self.function_h(reg_b,reg_c,reg_d)
+        else:
+          fun_ret = self.function_i(reg_b,reg_c,reg_d)
 
-          addition_chain = (((((reg_a + fun_ret) & 0xFFFFFFFF) + self.swap_byte_order(int(data_32bit,2))) & 0xFFFFFFFF) + TConst.values[i]) & 0xFFFFFFFF
-          reg_a = reg_d
-          reg_d = reg_c
-          reg_c = reg_b
-          reg_b = (reg_b + self.left_bit_rotate(addition_chain,ShiftConst.values[i])) & 0xFFFFFFFF
-          if(i == 0):
-            cntr += 1
-            print("i: " + str(i))
-            print("data: " + data_32bit)
-    
+        addition_chain = (((((reg_a + fun_ret) & 0xFFFFFFFF) + self.swap_byte_order(int(data_32bit,2))) & 0xFFFFFFFF) + TConst.values[i]) & 0xFFFFFFFF
+        reg_a = reg_d
+        reg_d = reg_c
+        reg_c = reg_b
+        reg_b = (reg_b + self.left_bit_rotate(addition_chain,ShiftConst.values[i])) & 0xFFFFFFFF
 
-        self.reg_a = (self.reg_a + reg_a) & 0xFFFFFFFF
-        self.reg_b = (self.reg_b + reg_b) & 0xFFFFFFFF
-        self.reg_c = (self.reg_c + reg_c) & 0xFFFFFFFF
-        self.reg_d = (self.reg_d + reg_d) & 0xFFFFFFFF
-        """
-        print(hex(self.reg_a))
-        print(hex(self.reg_b))
-        print(hex(self.reg_c))
-        print(hex(self.reg_d))
-        """
-    print(cntr)
+        print("i: " + str(i))
+        print("CHUNK START: " + str((32*(i % 16)) //8))
+        print("CHUNK END: " + str((32*((i % 16 +1)))//8))
+        print("FUN: " + str(hex(fun_ret)))
+        print("DATA: " + str(hex(self.swap_byte_order(int(data_32bit,2)))))
+        print("REG A: " + str(hex(reg_a)))
+        print("REG B: " + str(hex(reg_b)))
+        print("REG C: " + str(hex(reg_c)))
+        print("REG D: " + str(hex(reg_d)))
+      print("KONIEC BLOKU")
+      self.reg_a = (self.reg_a + reg_a) & 0xFFFFFFFF
+      self.reg_b = (self.reg_b + reg_b) & 0xFFFFFFFF
+      self.reg_c = (self.reg_c + reg_c) & 0xFFFFFFFF
+      self.reg_d = (self.reg_d + reg_d) & 0xFFFFFFFF
+      
+    print(hex(self.reg_a))
+    print(hex(self.reg_b))
+    print(hex(self.reg_c))
+    print(hex(self.reg_d))
+      
     return str(self.reg_a) + str(self.reg_b) + str(self.reg_c) + str(self.reg_c)           
 
 if __name__ == "__main__":
-  #my_str = "THIS IS MY TEXTč"
-  my_str = "THIS IS MY TEXTččččččččččččččččččččččččččččččččččččččččččččččččččččččččččččččččččč5"
+  my_str = "THIS IS MY TEXTč"
+  #my_str = "THIS IS MY TEXTččččččččččččččččččččččččččččččččččččččččččččččččččččččččččččččččččč5"
   input_data = InputData(my_str,"text")
   input_data.transform_to_bits()
   print(input_data.get_input_data_bin())
