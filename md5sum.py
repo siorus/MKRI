@@ -139,6 +139,7 @@ class InputData:
     modulo = len(self.input_data_bin) % 512
     if modulo != 448:
       zeroes_to_add = 448 - modulo
+      print("ADDED ZEROES: " + str(zeroes_to_add))
       self.input_data_bin += zeroes_to_add * "0"
     self.transform_message_length()
     self.input_data_bin += self.padded_data_bin_len
@@ -196,32 +197,41 @@ class Md5:
       #for nth_32bit_block in range(16):
       #  data_32bit = input_data.input_data_bin[512*nth_block:512*(nth_block+1)][32*nth_32bit_block:32*(nth_32bit_block+1)]
       for i in range(64):
-        data_32bit = input_data.input_data_bin[512*nth_block:512*(nth_block+1)][32*(i % 16):32*((i % 16 +1))]
+        #print(hex(int(input_data.input_data_bin[512*nth_block:512*(nth_block+1)],2)))
+        #data_32bit = input_data.input_data_bin[512*nth_block:512*(nth_block+1)][32*(i % 16):32*((i % 16 +1))]
+        #data_32bit = self.swap_byte_order(int(data_32bit,2))
+        data_512bit = input_data.input_data_bin[512*nth_block:512*(nth_block+1)]
         if (i <= 15):
           fun_ret = self.function_f(reg_b,reg_c,reg_d)
+          nth_word = i
         elif (i <= 31):
           fun_ret = self.function_g(reg_b,reg_c,reg_d)
+          nth_word = (5*i + 1) % 16
         elif (i <= 47):
           fun_ret = self.function_h(reg_b,reg_c,reg_d)
+          nth_word = (3*i + 5) % 16
         else:
           fun_ret = self.function_i(reg_b,reg_c,reg_d)
-
-        addition_chain = (((((reg_a + fun_ret) & 0xFFFFFFFF) + self.swap_byte_order(int(data_32bit,2))) & 0xFFFFFFFF) + TConst.values[i]) & 0xFFFFFFFF
+          nth_word = (7*i) % 16
+        #data_32bit = 
+        addition_chain = (((((reg_a + fun_ret) & 0xFFFFFFFF) + self.swap_byte_order(int(data_512bit[32*nth_word:32*(nth_word + 1)],2))) & 0xFFFFFFFF) + TConst.values[i]) & 0xFFFFFFFF
         reg_a = reg_d
         reg_d = reg_c
         reg_c = reg_b
         reg_b = (reg_b + self.left_bit_rotate(addition_chain,ShiftConst.values[i])) & 0xFFFFFFFF
-
+      """
         print("i: " + str(i))
-        print("CHUNK START: " + str((32*(i % 16)) //8))
-        print("CHUNK END: " + str((32*((i % 16 +1)))//8))
+        print("CHUNK START: " + str(4*nth_word))
+        print("CHUNK END: " + str(4*nth_word+4))
         print("FUN: " + str(hex(fun_ret)))
-        print("DATA: " + str(hex(self.swap_byte_order(int(data_32bit,2)))))
+        print("DATA: " + str(hex(int(data_512bit[32*nth_word:32*(nth_word + 1)],2))))
+        print("DATA2: " + str(hex(self.swap_byte_order(int(data_512bit[32*nth_word:32*(nth_word + 1)],2)))))
         print("REG A: " + str(hex(reg_a)))
         print("REG B: " + str(hex(reg_b)))
         print("REG C: " + str(hex(reg_c)))
         print("REG D: " + str(hex(reg_d)))
       print("KONIEC BLOKU")
+      """
       self.reg_a = (self.reg_a + reg_a) & 0xFFFFFFFF
       self.reg_b = (self.reg_b + reg_b) & 0xFFFFFFFF
       self.reg_c = (self.reg_c + reg_c) & 0xFFFFFFFF
@@ -235,7 +245,7 @@ class Md5:
     return str(self.reg_a) + str(self.reg_b) + str(self.reg_c) + str(self.reg_c)           
 
 if __name__ == "__main__":
-  my_str = "THIS IS MY TEXTč"
+  my_str = "THIS IS MY TEXT"
   #my_str = "THIS IS MY TEXTččččččččččččččččččččččččččččččččččččččččččččččččččččččččččččččččččč5"
   input_data = InputData(my_str,"text")
   input_data.transform_to_bits()
@@ -244,7 +254,9 @@ if __name__ == "__main__":
   input_data.bit_length_alignment()
   print(input_data.padded_data_bin_len)
   print("\n")
+  print(hex(int(input_data.input_data_bin,2)))
   print(bin(int(input_data.input_data_bin,2)))
+  print(hex(int.from_bytes(int(input_data.input_data_bin,2).to_bytes(len(input_data.input_data_bin)//8,byteorder='little'), byteorder='big')))
   print("NUM OF INT BLOCKS: " + str(input_data.num_of_bin_blocks))
   md5 = Md5(InitRegisters)
   print(hex(int(md5.rounds(input_data))))
