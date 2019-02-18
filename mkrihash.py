@@ -2,7 +2,7 @@
 # coding: utf-8
 
 '''
-  File name: md5sum.py
+  File name: mkrihash.py
   Author: Juraj Korcek
   Date created: 12/2/2019
   Date last modified: 12/2/2019
@@ -53,7 +53,6 @@ class TConst:
 class InputData:
 
   def __init__(self,input_data,input_type,is_file):
-
     if (is_file):
       self.input_data = self.open_file(input_data,input_type)
     else:
@@ -185,7 +184,7 @@ class Md5:
 
 if __name__ == "__main__":
   version = 1.0
-  parser = argparse.ArgumentParser(prog="md5sum.py", description="MD5 hash generator",formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+  parser = argparse.ArgumentParser(prog="mkri_hash.py", description="MD5 hash generator",formatter_class=argparse.ArgumentDefaultsHelpFormatter)
   parser.add_argument("-v","--version",action="version", version="%(prog)s"+" version "+str(version))
   parser.add_argument("-m","--machine-readable",help="prints output in machine readable form, only result hash",action="store_true")
   special_run = parser.add_mutually_exclusive_group(required=True)
