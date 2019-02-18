@@ -69,12 +69,17 @@ class InputData:
     """
     self.input_data = input_data
     self.input_type = input_type
+    self.input_data_byte = 0
     self.input_data_bin = ""
-    self.input_data_len = len(input_data)
+    self.input_data_len = 0
     self.input_data_bin_len = 0  # in decimal len of input data in binary without padding
     self.padded_data_bin_len = 0  #in binary with leading zeros
     self.num_of_bin_blocks = 0
-
+    self.input_data_padded_len = 0
+    self.num_of_blocks = 0
+    self.data_bin_len = 0
+  
+  #DELETE THIS
   def transform_to_bits(self):
     """ Description
     :type self:
@@ -88,6 +93,10 @@ class InputData:
     for i in range(len(hex_string) // 2):
       self.input_data_bin += format(int(hex_string[2*i:2*i+2],16),"0>8b") # "0>8b" means add leading zeroes when num in binnary is not in 8 bit representation
     self.set_input_len_bin()
+  
+
+  def transform_to_bytes(self):
+    self.input_data_byte = bytearray(self.input_data.encode('utf-8'))
 
   def set_input_len_bin(self):
     """ Description
@@ -102,6 +111,9 @@ class InputData:
 
   def set_num_of_bin_blocks(self):
     self.num_of_bin_blocks = len(self.input_data_bin) // 512
+  
+  def set_num_of_blocks(self):
+    self.num_of_blocks = self.input_data_padded_len // 64
 
   def get_input_data_bin(self):
     """ Description
@@ -145,6 +157,38 @@ class InputData:
     self.input_data_bin += self.padded_data_bin_len
     self.set_num_of_bin_blocks()
 
+  def byte_length_alignment(self):
+    
+    """ Description
+    :type self:
+    :param self:
+  
+    :raises:
+  
+    :rtype:
+    """
+    self.transform_message_length_byte()
+    self.input_data_byte += 0x80.to_bytes(1, byteorder="little")
+    #print(str(hex(int.from_bytes(self.input_data_byte,byteorder="little"))))
+    modulo = len(self.input_data_byte) % 64
+    if modulo != 56:
+      zeroes_to_add = 56 - modulo
+      self.input_data_byte += zeroes_to_add * 0x00.to_bytes(1, byteorder="little")
+    #print(str(hex(int.from_bytes(self.input_data_byte,byteorder="little")))) 
+    #print(type(self.data_bin_len))
+    self.input_data_byte += self.input_data_len.to_bytes(8, byteorder="little")
+    #print(str(hex(int.from_bytes(self.input_data_byte,byteorder="little"))))
+    self.set_num_of_blocks() 
+    """
+    modulo = len(self.input_data_bin) % 512
+    if modulo != 448:
+      zeroes_to_add = 448 - modulo
+      print("ADDED ZEROES: " + str(zeroes_to_add))
+      self.input_data_bin += zeroes_to_add * "0"
+    self.transform_message_length()
+    self.input_data_bin += self.padded_data_bin_len
+    self.set_num_of_bin_blocks()
+    """
   def transform_message_length(self):
     
     """ Description
@@ -155,8 +199,22 @@ class InputData:
   
     :rtype:
     """
+
     padded_data_bin_len = self.input_data_bin_len
     self.padded_data_bin_len = format(padded_data_bin_len,"0>64b")
+
+  def transform_message_length_byte(self):
+    
+    """ Description
+    :type self:
+    :param self:
+  
+    :raises:
+  
+    :rtype:
+    """
+    self.input_data_len = (len(self.input_data_byte) * 8)
+    #self.data_bin_len = format(self.input_data_len * 8,"0>64b")
 
 class Md5:
   
@@ -189,18 +247,20 @@ class Md5:
     return int.from_bytes(to_be_swapped.to_bytes(4,byteorder='little'), byteorder='big')
 
   def rounds(self,input_data):
-    reg_a, reg_b, reg_c, reg_d = self.reg_a, self.reg_b, self.reg_c, self.reg_d
+    
 
 
 
     for nth_block in range(input_data.num_of_bin_blocks): #loop over 512bit parts of input
+      reg_a, reg_b, reg_c, reg_d = self.reg_a, self.reg_b, self.reg_c, self.reg_d
       #for nth_32bit_block in range(16):
       #  data_32bit = input_data.input_data_bin[512*nth_block:512*(nth_block+1)][32*nth_32bit_block:32*(nth_32bit_block+1)]
       for i in range(64):
         #print(hex(int(input_data.input_data_bin[512*nth_block:512*(nth_block+1)],2)))
         #data_32bit = input_data.input_data_bin[512*nth_block:512*(nth_block+1)][32*(i % 16):32*((i % 16 +1))]
         #data_32bit = self.swap_byte_order(int(data_32bit,2))
-        data_512bit = input_data.input_data_bin[512*nth_block:512*(nth_block+1)]
+        data_512bit = input_data.input_data_byte[64*nth_block:64*(nth_block+1)]
+        print("BLOCK: " + str(hex(int.from_bytes(data_512bit,byteorder="little"))))
         if (i <= 15):
           fun_ret = self.function_f(reg_b,reg_c,reg_d)
           nth_word = i
@@ -214,44 +274,52 @@ class Md5:
           fun_ret = self.function_i(reg_b,reg_c,reg_d)
           nth_word = (7*i) % 16
         #data_32bit = 
-        addition_chain = (((((reg_a + fun_ret) & 0xFFFFFFFF) + self.swap_byte_order(int(data_512bit[32*nth_word:32*(nth_word + 1)],2))) & 0xFFFFFFFF) + TConst.values[i]) & 0xFFFFFFFF
+        addition_chain = (((((reg_a + fun_ret) & 0xFFFFFFFF) + int.from_bytes(data_512bit[4*nth_word:4*(nth_word + 1)],byteorder="little")) & 0xFFFFFFFF) + TConst.values[i]) & 0xFFFFFFFF
         reg_a = reg_d
         reg_d = reg_c
         reg_c = reg_b
         reg_b = (reg_b + self.left_bit_rotate(addition_chain,ShiftConst.values[i])) & 0xFFFFFFFF
-      """
+      
         print("i: " + str(i))
         print("CHUNK START: " + str(4*nth_word))
         print("CHUNK END: " + str(4*nth_word+4))
         print("FUN: " + str(hex(fun_ret)))
-        print("DATA: " + str(hex(int(data_512bit[32*nth_word:32*(nth_word + 1)],2))))
-        print("DATA2: " + str(hex(self.swap_byte_order(int(data_512bit[32*nth_word:32*(nth_word + 1)],2)))))
+        print("DATA: " + str(hex(int.from_bytes(data_512bit[4*nth_word:4*(nth_word + 1)],"little"))))
         print("REG A: " + str(hex(reg_a)))
         print("REG B: " + str(hex(reg_b)))
         print("REG C: " + str(hex(reg_c)))
         print("REG D: " + str(hex(reg_d)))
       print("KONIEC BLOKU")
-      """
+      
       self.reg_a = (self.reg_a + reg_a) & 0xFFFFFFFF
       self.reg_b = (self.reg_b + reg_b) & 0xFFFFFFFF
       self.reg_c = (self.reg_c + reg_c) & 0xFFFFFFFF
       self.reg_d = (self.reg_d + reg_d) & 0xFFFFFFFF
-      
+
+    hash = 0x0
+    hash = hash | int.from_bytes(self.reg_a.to_bytes(32,byteorder="little"), byteorder='big')
+    hash = hash << 32 | int.from_bytes(self.reg_b.to_bytes(32,byteorder="little"), byteorder='big')
+    hash = hash << 32 | int.from_bytes(self.reg_c.to_bytes(32,byteorder="little"), byteorder='big')
+    hash = hash << 32 | int.from_bytes(self.reg_d.to_bytes(32,byteorder="little"), byteorder='big')
+    print(hex(hash))
+    print(hex(int.from_bytes(self.reg_a.to_bytes(32,byteorder="little"), byteorder='big')))
     print(hex(self.reg_a))
     print(hex(self.reg_b))
     print(hex(self.reg_c))
     print(hex(self.reg_d))
-      
-    return str(self.reg_a) + str(self.reg_b) + str(self.reg_c) + str(self.reg_c)           
+
+        
+    return hash           
 
 if __name__ == "__main__":
-  my_str = "THIS IS MY TEXT"
-  #my_str = "THIS IS MY TEXTččččččččččččččččččččččččččččččččččččččččččččččččččččččččččččččččččč5"
+  #my_str = "THIS IS MY TEXT"
+  my_str = "THIS IS MY TEXTččččččččččččččččččččččččččččččččččččččččččččččččččččččččččččččččččč5"
   input_data = InputData(my_str,"text")
   input_data.transform_to_bits()
   print(input_data.get_input_data_bin())
   print(input_data.get_input_data_bin_len())
   input_data.bit_length_alignment()
+  """
   print(input_data.padded_data_bin_len)
   print("\n")
   print(hex(int(input_data.input_data_bin,2)))
@@ -260,6 +328,13 @@ if __name__ == "__main__":
   print("NUM OF INT BLOCKS: " + str(input_data.num_of_bin_blocks))
   md5 = Md5(InitRegisters)
   print(hex(int(md5.rounds(input_data))))
+  """
+  input_data.transform_to_bytes()
+  input_data.byte_length_alignment()
+  print(hex(int.from_bytes(input_data.input_data_byte,"little")))
+  md5 = Md5(InitRegisters)
+  print(hex(md5.rounds(input_data))[2:34])
+  print(input_data.input_data_len)
 
   #TODO ARGUMENTS
   #TODO PYDOC
