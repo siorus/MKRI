@@ -127,12 +127,14 @@ class Md5:
   def swap_byte_order(self,to_be_swapped):
     return int.from_bytes(to_be_swapped.to_bytes(4,byteorder='little'), byteorder='big')
 
-  def produce_hash(self,reg_a,reg_b,reg_c,reg_d):
+  def produce_hash(self):
     hash = 0x0
-    hash = hash | int.from_bytes(self.reg_a.to_bytes(32,byteorder="little"), byteorder='big')
-    hash = hash << 32 | int.from_bytes(self.reg_b.to_bytes(32,byteorder="little"), byteorder='big')
-    hash = hash << 32 | int.from_bytes(self.reg_c.to_bytes(32,byteorder="little"), byteorder='big')
-    hash = hash << 32 | int.from_bytes(self.reg_d.to_bytes(32,byteorder="little"), byteorder='big')
+    hash = hash | self.reg_d
+    hash = hash << 32 | self.reg_c
+    hash = hash << 32 | self.reg_b
+    hash = hash << 32 | self.reg_a
+    hash = '{:032x}'.format(int.from_bytes(hash.to_bytes(16, byteorder='little'), byteorder='big'))
+
     return hash
 
   def rounds(self,input_data):
@@ -177,14 +179,12 @@ class Md5:
       self.reg_d = (self.reg_d + reg_d) & 0xFFFFFFFF
 
     """
-    print(hex(hash))
-    print(hex(int.from_bytes(self.reg_a.to_bytes(32,byteorder="little"), byteorder='big')))
     print(hex(self.reg_a))
     print(hex(self.reg_b))
     print(hex(self.reg_c))
     print(hex(self.reg_d))
     """
-    return self.produce_hash(reg_a,reg_b,reg_c,reg_d)           
+    return self.produce_hash()           
 
 if __name__ == "__main__":
   version = 1.0
@@ -210,8 +210,9 @@ if __name__ == "__main__":
   input_data.transform_to_bytes(data_type)
   input_data.byte_length_alignment()
   md5 = Md5(InitRegisters)
+  hash = md5.rounds(input_data)
   if (args.machine_readable):
-    print(hex(md5.rounds(input_data))[2:34])
+    print(hash)
   else:
     if (args.inline_text):
       print("INLINE TEXT: " + args.inline_text)
@@ -219,9 +220,7 @@ if __name__ == "__main__":
       print("TEXT FILE: " + args.text_file)
     elif(args.binary_file):
       print("BINARY FILE: " + args.binary_file)
-    print("MD5 HASH: " + str(hex(md5.rounds(input_data))[2:34]))
-  #print(len(input_data.input_data_byte))#DELETE
-  #print(input_data.input_data_len)
+    print("MD5 HASH: " + hash)
   #my_str = "THIS IS MY TEXTččččččččččččččččččččččččččččččččččččččččččččččččččččččččččččččččččč5"
   #TODO PYDOC
   
