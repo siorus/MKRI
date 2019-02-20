@@ -3,15 +3,14 @@
 
 '''
   File name: mkrihash.py
-  Author: Juraj Korcek
+  Author: Juraj Korcek, Karel Kuchar, Eva Holasova, Lukas Hrboticky
   Date created: 12/2/2019
-  Date last modified: 12/2/2019
+  Date last modified: 18/2/2019
   Python Version: 3.5
 '''
 
-__author__ = 'Juraj Korcek, Credit others'
+__author__ = 'Juraj Korcek, Karel Kuchar, Eva Holasova, Lukas Hrboticky'
 __copyright__ = 'Copyright 2019, Juraj Korcek & Co.'
-__credits__ = ['Others']
 __license__ = 'GPL'
 __version__ = '3'
 __email__ = 'jurajkorcek@gmail.com'
@@ -82,9 +81,14 @@ class InputData:
     self.set_input_data_len()
     self.input_data_byte += 0x80.to_bytes(1, byteorder="little")
     modulo = len(self.input_data_byte) % 64
+    #print("MODULO: " + str(modulo)) #DELETE
 
     if modulo != 56:
-      zeroes_to_add = 56 - modulo
+      if modulo > 56:
+        zeroes_to_add = 56 + (64-modulo)
+      else:
+        zeroes_to_add = 56 - modulo
+      #print("ZEROES TO ADD: " + str(zeroes_to_add)) #DELETE
       self.input_data_byte += zeroes_to_add * 0x00.to_bytes(1, byteorder="little")
     
     self.input_data_byte += self.input_data_len.to_bytes(8, byteorder="little")
@@ -132,7 +136,7 @@ class Md5:
     return hash
 
   def rounds(self,input_data):
-
+    #print("NUM OF BLOCKS: " + str(input_data.num_of_blocks))
     for nth_block in range(input_data.num_of_blocks): #loop over 512bit parts of input
       reg_a, reg_b, reg_c, reg_d = self.reg_a, self.reg_b, self.reg_c, self.reg_d
       for i in range(64):
@@ -165,7 +169,7 @@ class Md5:
         print("REG B: " + str(hex(reg_b)))
         print("REG C: " + str(hex(reg_c)))
         print("REG D: " + str(hex(reg_d)))
-      print("KONIEC BLOKU")
+      print("KONIEC BLOKU " + str(nth_block))
       """
       self.reg_a = (self.reg_a + reg_a) & 0xFFFFFFFF
       self.reg_b = (self.reg_b + reg_b) & 0xFFFFFFFF
@@ -184,7 +188,7 @@ class Md5:
 
 if __name__ == "__main__":
   version = 1.0
-  parser = argparse.ArgumentParser(prog="mkri_hash.py", description="MD5 hash generator",formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+  parser = argparse.ArgumentParser(prog="mkrihash.py", description="MD5 hash generator",formatter_class=argparse.ArgumentDefaultsHelpFormatter)
   parser.add_argument("-v","--version",action="version", version="%(prog)s"+" version "+str(version))
   parser.add_argument("-m","--machine-readable",help="prints output in machine readable form, only result hash",action="store_true")
   special_run = parser.add_mutually_exclusive_group(required=True)
@@ -216,6 +220,8 @@ if __name__ == "__main__":
     elif(args.binary_file):
       print("BINARY FILE: " + args.binary_file)
     print("MD5 HASH: " + str(hex(md5.rounds(input_data))[2:34]))
+  #print(len(input_data.input_data_byte))#DELETE
+  #print(input_data.input_data_len)
   #my_str = "THIS IS MY TEXTččččččččččččččččččččččččččččččččččččččččččččččččččččččččččččččččččč5"
   #TODO PYDOC
   
