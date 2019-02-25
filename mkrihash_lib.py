@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/python37
 # coding: utf-8
 
 '''
@@ -42,12 +42,35 @@ class InputData:
       self.input_data_byte = self.input_data
     else:
       self.input_data_byte = bytearray(self.input_data.encode('utf-8'))
-      
+
+class Hash:
+
+  def __init__(self):
+    hash_value = None
+
+  def hash_it(self,input_data, algorithm):
+    if (algorithm == "md5"):
+      self.hash_value = hashlib.md5()
+      self.hash_value.update(input_data)
+    elif (algorithm == "sha1"):
+      self.hash_value = hashlib.sha1()
+      self.hash_value.update(input_data)
+    elif (algorithm == "sha2"):
+      self.hash_value = hashlib.sha512()
+      self.hash_value.update(input_data)
+    elif (algorithm == "sha3"):
+      self.hash_value = hashlib.sha3_512()
+      self.hash_value.update(input_data)
+    elif (algorithm == "blake2"):
+      self.hash_value = hashlib.blake2b()
+      self.hash_value.update(input_data)
+
 if __name__ == "__main__":
   version = 1.0
   parser = argparse.ArgumentParser(prog="mkrihashlib.py", description="MD5 hash generator with hashlib",formatter_class=argparse.ArgumentDefaultsHelpFormatter)
   parser.add_argument("-v","--version",action="version", version="%(prog)s"+" version "+str(version))
   parser.add_argument("-m","--machine-readable",help="prints output in machine readable form, only result hash",action="store_true")
+  parser.add_argument("-a","--algorithm",help="defines hashing algorithm",action="store",choices=["md5","sha1","sha2","sha3","blake2"],required=True)
   special_run = parser.add_mutually_exclusive_group(required=True)
   special_run.add_argument("-i","--inline-text",help="input for MD5 is text and written after this argument",action="store")
   special_run.add_argument("-t","--text-file",metavar="FILE",help="input for MD5 is text file and specify path to it",action="store")
@@ -65,10 +88,11 @@ if __name__ == "__main__":
     input_data = InputData(args.binary_file,data_type,True)
 
   input_data.transform_to_bytes(data_type)
-  md5 = hashlib.md5()
-  md5.update(input_data.input_data_byte)
+  hash_obj = Hash() 
+  hash_obj.hash_it(input_data.input_data_byte,args.algorithm)
+
   if (args.machine_readable):
-    print(md5.hexdigest())
+    print(hash_obj.hash_value.hexdigest())
   else:
     if (args.inline_text):
       print("INLINE TEXT: " + args.inline_text)
@@ -76,7 +100,7 @@ if __name__ == "__main__":
       print("TEXT FILE: " + args.text_file)
     elif(args.binary_file):
       print("BINARY FILE: " + args.binary_file)
-    print("MD5 HASH: " + str(md5.hexdigest()))
+    print((args.algorithm).upper() + " HASH: " + str(hash_obj.hash_value.hexdigest()))
   #my_str = "THIS IS MY TEXTččččččččččččččččččččččččččččččččččččččččččččččččččččččččččččččččččč5"
   #TODO PYDOC
   
