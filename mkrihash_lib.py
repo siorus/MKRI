@@ -2,15 +2,15 @@
 # coding: utf-8
 
 '''
-  File name: mkrihash.py
+  File name: mkrihash_lib.py
   Author: Juraj Korcek, Karel Kuchar, Eva Holasova, Lukas Hrboticky
   Date created: 12/2/2019
-  Date last modified: 18/2/2019
+  Date last modified: 24/3/2019
   Python Version: 3.5
 '''
 
 __author__ = 'Juraj Korcek, Karel Kuchar, Eva Holasova, Lukas Hrboticky'
-__copyright__ = 'Copyright 2019, Juraj Korcek & Co.'
+__copyright__ = 'Copyright 2019, Juraj Korcek, Karel Kuchar, Eva Holasova, Lukas Hrboticky'
 __license__ = 'GPL'
 __version__ = '3'
 __email__ = 'jurajkorcek@gmail.com'
@@ -71,6 +71,7 @@ if __name__ == "__main__":
   parser.add_argument("-v","--version",action="version", version="%(prog)s"+" version "+str(version))
   parser.add_argument("-m","--machine-readable",help="prints output in machine readable form, only result hash",action="store_true")
   parser.add_argument("-a","--algorithm",help="defines hashing algorithm",action="store",choices=["md5","sha1","sha2","sha3","blake2"],required=True)
+  parser.add_argument("-d","--debug",help="Debugging mode, shows intermediate hash results",action="store_true")
   special_run = parser.add_mutually_exclusive_group(required=True)
   special_run.add_argument("-i","--inline-text",help="input for MD5 is text and written after this argument",action="store")
   special_run.add_argument("-t","--text-file",metavar="FILE",help="input for MD5 is text file and specify path to it",action="store")
@@ -82,7 +83,7 @@ if __name__ == "__main__":
     input_data = InputData(args.text_file,data_type,True)
   elif (args.inline_text):
     data_type = ""
-    input_data = InputData(args.inline_text,data_type,False)
+    input_data = InputData(args.inline_text,data_type,False)  #is_file bool is false, inline input
   else:
     data_type = "b"
     input_data = InputData(args.binary_file,data_type,True)
