@@ -106,9 +106,6 @@ class InputData:
         self.input_data = input_data
       else:
         self.input_data = bytearray(input_data.encode('utf-8'))
-    
-    #self.input_type = input_type   #DELETE
-    #self.input_data_byte = 0   #DELETE   
     self.input_data_len = 0
     self.num_of_blocks = 0
 
@@ -128,15 +125,6 @@ class InputData:
     file_descr.close()
     return file_data
   
-  #DELETE
-  """
-  def transform_to_bytes(self):
-    if (self.input_type == "b"):
-      self.input_data_byte = self.input_data
-    else:
-      self.input_data_byte = bytearray(self.input_data.encode('utf-8'))
-  """
-
   def set_num_of_blocks(self):
     """
     Sets number of 512 bit blocks from which consists padded input data
@@ -156,7 +144,6 @@ class InputData:
     """
     self.input_data += 0x80.to_bytes(1, byteorder="little")
     modulo = len(self.input_data) % 64
-    #print("MODULO: " + str(modulo)) #DELETE
 
     #black magic which determines number of zeroes to add
     if modulo != 56:
@@ -164,7 +151,6 @@ class InputData:
         zeroes_to_add = 56 + (64-modulo)
       else:
         zeroes_to_add = 56 - modulo
-      #print("ZEROES TO ADD: " + str(zeroes_to_add)) #DELETE
       self.input_data += zeroes_to_add * 0x00.to_bytes(1, byteorder="little")
     
     self.input_data += self.input_data_len.to_bytes(8, byteorder="little")  #add len of input string before bit padding
@@ -315,7 +301,6 @@ class Md5:
     Returns:
         Hash of input data.
     """
-    #print("NUM OF BLOCKS: " + str(input_data.num_of_blocks)) #DELETE
     for nth_block in range(input_data.num_of_blocks):  #loop over every 512bit parts of input
       reg_a, reg_b, reg_c, reg_d = self.reg_a, self.reg_b, self.reg_c, self.reg_d  #store registers in temporary variable
       for i in range(64):  #loop over every byte
@@ -358,7 +343,7 @@ class Md5:
       self.reg_b = (self.reg_b + reg_b) & 0xFFFFFFFF
       self.reg_c = (self.reg_c + reg_c) & 0xFFFFFFFF
       self.reg_d = (self.reg_d + reg_d) & 0xFFFFFFFF
-      
+
     return self.produce_hash()           
 
 if __name__ == "__main__":
@@ -386,7 +371,6 @@ if __name__ == "__main__":
     data_type = "b"  #input file is binary
     input_data = InputData(args.binary_file,data_type,True)
 
-  #input_data.transform_to_bytes() #DELETE
   input_data.byte_length_alignment()
   md5 = Md5(InitRegisters)
   hash = md5.rounds(input_data)
