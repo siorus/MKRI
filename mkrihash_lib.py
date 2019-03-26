@@ -142,5 +142,3 @@ if __name__ == "__main__":
     elif(args.binary_file):
       print("BINARY FILE: " + args.binary_file)
     print((args.algorithm).upper() + " HASH: " + str(hash_obj.hash_value.hexdigest()))
-  #my_str = "THIS IS MY TEXTččččččččččččččččččččččččččččččččččččččččččččččččččččččččččččččččččč5"
-  #TODO PYDOC

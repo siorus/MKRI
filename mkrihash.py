@@ -329,14 +329,14 @@ class Md5:
           print("i: " + str(i))
           print("CHUNK START: " + str(4*nth_word))
           print("CHUNK END: " + str(4*nth_word+4))
-          print("FUN: " + str(hex(fun_ret)))
+          print("FUNCTION RET: " + str(hex(fun_ret)))
           print("DATA: " + str(hex(int.from_bytes(data_512bit[4*nth_word:4*(nth_word + 1)],"little"))))
           print("REG A: " + str(hex(reg_a)))
           print("REG B: " + str(hex(reg_b)))
           print("REG C: " + str(hex(reg_c)))
           print("REG D: " + str(hex(reg_d)))
       if (DEBUG):  
-        print("KONIEC BLOKU " + str(nth_block))
+        print("END OF BLOCK " + str(nth_block))
       
       #final result assignments to registers
       self.reg_a = (self.reg_a + reg_a) & 0xFFFFFFFF
@@ -353,18 +353,18 @@ if __name__ == "__main__":
   parser.add_argument("-m","--machine-readable",help="prints output in machine readable form, only result hash",action="store_true")
   parser.add_argument("-d","--debug",help="Debugging mode, shows intermediate hash results",action="store_true")
   special_run = parser.add_mutually_exclusive_group(required=True)
-  special_run.add_argument("-i","--inline-text",help="input for MD5 is text and written after this argument",action="store")
   special_run.add_argument("-t","--text-file",metavar="FILE",help="input for MD5 is text file and specify path to it",action="store")
   special_run.add_argument("-b","--binary-file",help="input for MD5 is binary file and specify path to it",action="store")
+  special_run.add_argument("-i","--inline-text",help="input for MD5 is text and written after this argument",action="store")
   args = parser.parse_args()
 
   if (args.debug):
     DEBUG = True
-
+  
   if (args.text_file):
     data_type = ""
     input_data = InputData(args.text_file,data_type,True)
-  elif (args.inline_text):
+  elif (args.inline_text or args.inline_text == ""):
     data_type = ""
     input_data = InputData(args.inline_text,data_type,False)  #is_file bool is false, inline input
   else:

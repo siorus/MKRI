@@ -1,0 +1,29 @@
+PRIEMER Z 5 MERANI
+
+INPUT: "abc"
+mkrihash.py 0.040
+mkrihash_lib.py 0.044
+md5sum 0.004
+
+INPUT: "12345678901234567890123456789012345678901234567890123456789012345678901234567890"
+mkrihash.py 0.056
+mkrihash_lib.py 0.052
+md5sum 0.008
+
+INPUT: bin/chvt
+mkrihash.py 0.64
+mkrihash_lib.py 0.072
+md5sum 0.008
+
+INPUT: as.txt
+mkrihash.py 2.064
+mkrihash_lib.py 0.076
+md5sum 0.016
+
+
+mkrihash_lib.py 9MB fotka
+MD5 0.075
+SHA1 0.067
+SHA2 0.075
+SHA3 0.115
+BLAKE2 0.51
