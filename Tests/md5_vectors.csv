@@ -9,7 +9,6 @@ str,"123456789012345678901234567890123456789012345678901234567890123456789012345
 str,"abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq",8215ef0796a20bcaaae116d3876c664a
 str,"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789",d174ab98d277d9f5a5611c2c9f419d9f
 str,"The quick brown fox jumps over the lazy dog",9e107d9d372bb6826bd81d3542a419d6
-str,"Test vector from febooti.com",500ab6613c6db7fbd30c62f5ff573d0f
 binf,bin/chvt,853a0bf5c6c4091a57e21058ea96293c
 binf,bin/fgrep,3885488b9d1d10902c6b9c18e20bf952
 binf,bin/hciconfig,36d2aa76c07ef6589e02752bd124bc8c

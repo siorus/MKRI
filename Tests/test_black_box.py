@@ -4,6 +4,7 @@ import csv
 import sys
 import subprocess
 import os
+import platform
 
 #fd = open("md5_vectors.csv","r")
 csv.field_size_limit(sys.maxsize)
@@ -16,13 +17,22 @@ with open("md5_vectors.csv") as csv_file:
       first_line = False
       continue
     if (row[0] == "str"):
-      md5 = subprocess.run(["../mkrihash.py","-m","-i",row[1]],stdout=subprocess.PIPE)
+      if (platform.system() == "Windows"):
+        md5 = subprocess.run(["python.exe","../mkrihash.py","-m","-i",row[1]],stdout=subprocess.PIPE)
+      else:
+        md5 = subprocess.run(["../mkrihash.py","-m","-i",row[1]],stdout=subprocess.PIPE)
       md5 = md5.stdout.decode("utf-8")
     elif (row[0] == "binf"):
-      md5 = subprocess.run(["../mkrihash.py","-m","-b",row[1]],stdout=subprocess.PIPE)
+      if (platform.system() == "Windows"):
+        md5 = subprocess.run(["python.exe","../mkrihash.py","-m","-b",row[1]],stdout=subprocess.PIPE)
+      else:
+        md5 = subprocess.run(["../mkrihash.py","-m","-b",row[1]],stdout=subprocess.PIPE)
       md5 = md5.stdout.decode("utf-8")
     elif (row[0] == "texf"):
-      md5 = subprocess.run(["../mkrihash.py","-m","-t",row[1]],stdout=subprocess.PIPE)
+      if (platform.system() == "Windows"):
+        md5 = subprocess.run(["python.exe","../mkrihash.py","-m","-t",row[1]],stdout=subprocess.PIPE)
+      else:
+        md5 = subprocess.run(["../mkrihash.py","-m","-t",row[1]],stdout=subprocess.PIPE)
       md5 = md5.stdout.decode("utf-8")
     
     print("-----------------------------")

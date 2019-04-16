@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.shape.Line?>
+<?import javafx.scene.text.Text?>
+
+<AnchorPane fx:id="bitDelkaMD5" minHeight="200.0" minWidth="200.0" prefHeight="787.0" prefWidth="726.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mkri.Proces">
+   <children>
+      <Text layoutX="37.0" layoutY="80.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Zadejte text:" />
+      <TextField fx:id="hashVstupniPole" layoutX="134.0" layoutY="64.0" prefHeight="26.0" prefWidth="414.0" />
+      <Button fx:id="button" layoutX="581.0" layoutY="64.0" mnemonicParsing="false" onAction="#HashTEXT" prefHeight="26.0" prefWidth="106.0" text="HASHUJ" />
+      <Text layoutX="38.0" layoutY="212.0" strokeType="OUTSIDE" strokeWidth="0.0" text="HASH – IMPLEMENTACE MD5" />
+      <Text layoutX="38.0" layoutY="306.0" strokeType="OUTSIDE" strokeWidth="0.0" text="HASH – KNIHOVNA MD5" />
+      <TextField fx:id="hashImplementace" layoutX="38.0" layoutY="224.0" mouseTransparent="true" prefHeight="26.0" prefWidth="394.0" />
+      <TextField fx:id="hashKnihovna" layoutX="38.0" layoutY="258.0" mouseTransparent="true" prefHeight="26.0" prefWidth="394.0" />
+      <TextField fx:id="hashPorovnani" editable="false" layoutX="581.0" layoutY="241.0" prefHeight="26.0" prefWidth="105.0" text="SHODA?" />
+      <Text layoutX="163.0" layoutY="769.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Lukáš Hrbotický, Eva Holasová, Juraj Korček, Karel Kuchař" />
+      <Text layoutX="34.0" layoutY="119.0" strokeType="OUTSIDE" strokeWidth="0.0" text=" Nahrajte textový soubor" />
+      <Text layoutX="34.0" layoutY="151.0" strokeType="OUTSIDE" strokeWidth="0.0" text=" Nahrajte binární soubor" />
+      <Button fx:id="TXTbutton" layoutX="184.0" layoutY="102.0" mnemonicParsing="false" onAction="#HashTXTFile_nacti_cestu" text="Nacti" />
+      <Button fx:id="BINbutton" layoutX="184.0" layoutY="134.0" mnemonicParsing="false" onAction="#HashBINFile_nacti_cestu" text="Nacti" />
+      <Button fx:id="Vymazatbutton" layoutX="581.0" layoutY="309.0" mnemonicParsing="false" onAction="#Vymazat" prefHeight="26.0" prefWidth="106.0" text="Vymazat" />
+      <TextField fx:id="zadanaCestaTXT" layoutX="246.0" layoutY="104.0" prefHeight="26.0" prefWidth="301.0" />
+      <TextField fx:id="zadanaCestaBin" layoutX="246.0" layoutY="137.0" prefHeight="26.0" prefWidth="301.0" />
+      <Text layoutX="133.0" layoutY="362.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Jiné hashovací algoritmy implementované pomocí knihovny:" />
+      <Button layoutX="581.0" layoutY="564.0" mnemonicParsing="false" onAction="#SHA1" prefHeight="26.0" prefWidth="106.0" text="SHA 1" />
+      <Button layoutX="581.0" layoutY="598.0" mnemonicParsing="false" onAction="#SHA2" prefHeight="16.0" prefWidth="106.0" text="SHA 2" />
+      <Button fx:id="button111" layoutX="581.0" layoutY="632.0" mnemonicParsing="false" onAction="#SHA3" prefHeight="26.0" prefWidth="106.0" text="SHA 3" />
+      <Button fx:id="button1111" layoutX="581.0" layoutY="667.0" mnemonicParsing="false" onAction="#BLAKE2" prefHeight="26.0" prefWidth="106.0" text="BLAKE 2" />
+      <TextField fx:id="hashPomociKnihovnySHA1" layoutX="38.0" layoutY="564.0" prefHeight="26.0" prefWidth="394.0" />
+      <Text layoutX="41.0" layoutY="442.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Zadejte text:" />
+      <TextField fx:id="hashVstupniPole2" layoutX="134.0" layoutY="424.0" prefHeight="26.0" prefWidth="414.0" />
+      <Text layoutX="38.0" layoutY="481.0" strokeType="OUTSIDE" strokeWidth="0.0" text=" Nahrajte textový soubor" />
+      <Text layoutX="38.0" layoutY="513.0" strokeType="OUTSIDE" strokeWidth="0.0" text=" Nahrajte binární soubor" />
+      <Button layoutX="186.0" layoutY="461.0" mnemonicParsing="false" onAction="#nastavCestuTXT2" text="Nacti" />
+      <Button layoutX="186.0" layoutY="494.0" mnemonicParsing="false" onAction="#nastavCestuBIN2" text="Nacti" />
+      <TextField fx:id="zadanaCestaTXT2" layoutX="258.0" layoutY="460.0" prefHeight="26.0" prefWidth="290.0" />
+      <TextField fx:id="zadanaCestaBin2" layoutX="258.0" layoutY="493.0" prefHeight="26.0" prefWidth="290.0" />
+      <Button layoutX="580.0" layoutY="712.0" mnemonicParsing="false" onAction="#vymazDruhouCast" prefHeight="26.0" prefWidth="106.0" text="Vymazat" />
+      <TextField fx:id="hashPomociKnihovnySHA2" layoutX="38.0" layoutY="598.0" prefHeight="26.0" prefWidth="394.0" />
+      <TextField fx:id="hashPomociKnihovnySHA3" layoutX="38.0" layoutY="632.0" prefHeight="26.0" prefWidth="394.0" />
+      <TextField fx:id="hashPomociKnihovnyBLAKE2" layoutX="38.0" layoutY="667.0" prefHeight="26.0" prefWidth="394.0" />
+      <Line endX="414.0" layoutX="134.0" layoutY="371.0" startX="-100.0" />
+      <Text layoutX="142.0" layoutY="22.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Hash MD5 implementovaný pomocí pythonu a knihovny:" />
+      <Line endX="414.0" layoutX="134.0" layoutY="32.0" startX="-100.0" />
+      <TextField fx:id="bitDelkaSHA1" layoutX="438.0" layoutY="564.0" prefHeight="26.0" prefWidth="106.0" />
+      <TextField fx:id="bitDelkaSHA2" layoutX="438.0" layoutY="598.0" prefHeight="26.0" prefWidth="106.0" />
+      <TextField fx:id="bitDelkaSHA3" layoutX="438.0" layoutY="632.0" prefHeight="26.0" prefWidth="106.0" />
+      <TextField fx:id="bitDelkaBLAKE2" layoutX="438.0" layoutY="667.0" prefHeight="26.0" prefWidth="106.0" />
+      <TextField fx:id="bitDelkaMD5_python" layoutX="437.0" layoutY="224.0" prefHeight="26.0" prefWidth="114.0" />
+      <TextField fx:id="bitDelkaMD5_lib" layoutX="437.0" layoutY="258.0" prefHeight="26.0" prefWidth="114.0" />
+      <Button fx:id="button1" layoutX="580.0" layoutY="101.0" mnemonicParsing="false" onAction="#HashTXTFile" prefHeight="26.0" prefWidth="106.0" text="HASHUJ" />
+      <Button fx:id="button2" layoutX="581.0" layoutY="137.0" mnemonicParsing="false" onAction="#HashBINFile" prefHeight="26.0" prefWidth="106.0" text="HASHUJ" />
+   </children>
+</AnchorPane>

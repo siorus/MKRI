@@ -6,7 +6,7 @@
   Author: Juraj Korcek, Karel Kuchar, Eva Holasova, Lukas Hrboticky
   Date created: 12/2/2019
   Date last modified: 24/3/2019
-  Python Version: 3.5
+  Python Version: 3.7.2
 '''
 
 __author__ = 'Juraj Korcek, Karel Kuchar, Eva Holasova, Lukas Hrboticky'
@@ -384,5 +384,4 @@ if __name__ == "__main__":
     elif(args.binary_file):
       print("BINARY FILE: " + args.binary_file)
     print("MD5 HASH: " + hash)
-  #my_str = "THIS IS MY TEXTččččččččččččččččččččččččččččččččččččččččččččččččččččččččččččččččččč5" #DELETE
   

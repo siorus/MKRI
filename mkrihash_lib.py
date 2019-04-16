@@ -6,7 +6,7 @@
   Author: Juraj Korcek, Karel Kuchar, Eva Holasova, Lukas Hrboticky
   Date created: 12/2/2019
   Date last modified: 24/3/2019
-  Python Version: 3.5
+  Python Version: 3.7.2
 '''
 
 __author__ = 'Juraj Korcek, Karel Kuchar, Eva Holasova, Lukas Hrboticky'

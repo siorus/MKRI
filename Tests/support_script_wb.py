@@ -1,4 +1,9 @@
 #!/usr/bin/python3
+"""
+SOURCE: https://rosettacode.org/wiki/MD5/Implementation
+
+OWN CODE IS MARKED
+"""
 import math
 import sys
 import argparse
@@ -46,7 +51,7 @@ def md5(message):
             to_rotate = a + f + constants[i] + int.from_bytes(chunk[4*g:4*g+4], byteorder='little')
             new_b = (b + left_rotate(to_rotate, rotate_amounts[i])) & 0xFFFFFFFF
             a, b, c, d = d, new_b, b, c
-            
+            #BEGIN OF OWN CODE
             print("i: " + str(i))
             print("CHUNK START: " + str(4*g))
             print("CHUNK END: " + str(4*g+4))
@@ -56,10 +61,11 @@ def md5(message):
             print("REG B: " + str(hex(b)))
             print("REG C: " + str(hex(c)))
             print("REG D: " + str(hex(d)))
+            #END OF OWN CODE
         for i, val in enumerate([a, b, c, d]):
             hash_pieces[i] += val
             hash_pieces[i] &= 0xFFFFFFFF        
-        print("END OF BLOCK " + str(chunk_ofst//64))
+        print("END OF BLOCK " + str(chunk_ofst//64))  #OWN CODE
  
     return sum(x<<(32*i) for i, x in enumerate(hash_pieces))
  
